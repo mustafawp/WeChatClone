@@ -21,6 +21,11 @@ class _ChatUserCardState extends State<ChatUserCard> {
   Message? _message;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.symmetric(

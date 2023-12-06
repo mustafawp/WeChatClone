@@ -40,22 +40,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: FloatingActionButton.extended(
               backgroundColor: Colors.red,
               onPressed: () async {
-                Dialogs.showProgressbar(context);
+                Dialogs.showProgressbar(context); // yükleme ekranı
 
-                await APIs.updateActiveStatus(false);
+                await APIs.updateActiveStatus(
+                    false, true); // kullanıcı çevrimdışı
 
                 //sign out from app
                 await APIs.auth.signOut().then((value) async {
+                  // firebase auth dan çıkış yapıldı.
                   await GoogleSignIn().signOut().then((value) {
-                    //for hiding progress dialog
-                    Navigator.pop(context);
-
-                    //for moving to home screen
-                    Navigator.pop(context);
-
-                    APIs.auth = FirebaseAuth.instance;
-
-                    //replacing home screen with login screen
+                    // google dan çıkış yapıldı
+                    APIs.auth = FirebaseAuth.instance; // auth artık bş
+                    Navigator.pop(context); // yükleme ekranı kapatıldı
+                    Navigator.pop(context); // profil kapatıldı
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (_) => const LoginScreen()));
                   });

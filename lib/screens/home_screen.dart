@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<ChatUser> _searchList = [];
   bool _isSearching = false;
 
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -28,10 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
     SystemChannels.lifecycle.setMessageHandler((message) {
       if (APIs.auth.currentUser != null) {
         if (message.toString().contains("resume")) {
-          APIs.updateActiveStatus(true);
+          APIs.updateActiveStatus(true, false);
         }
         if (message.toString().contains("pause")) {
-          APIs.updateActiveStatus(false);
+          APIs.updateActiveStatus(false, false);
         }
       }
 

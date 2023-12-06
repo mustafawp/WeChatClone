@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wechat/api/apis.dart';
 import 'package:wechat/helper/date_util.dart';
@@ -29,7 +30,31 @@ class _ChatScreenState extends State<ChatScreen> {
 
   final _textController = TextEditingController();
 
-  bool _showEmoji = false, _isUpLoading = false;
+  bool _showEmoji = false, _isUpLoading = false, appLifeStyle = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    SystemChannels.lifecycle.setMessageHandler((message) {
+      if (message == "AppLifecycleState.resumed") {
+        setState(() {
+          appLifeStyle = true;
+        });
+      }
+      if (message == "AppLifecycleState.paused") {
+        setState(() {
+          appLifeStyle = false;
+        });
+      }
+      if (message == "AppLifecycleState.inactive") {
+        setState(() {
+          appLifeStyle = false;
+        });
+      }
+      return Future.value(message);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -348,6 +373,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemBuilder: (context, index) {
                     return MessageCard(
                       message: _list[index],
+                      state: appLifeStyle,
                     );
                   },
                 );
@@ -357,7 +383,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     onTap: () {
                       APIs.sendMessage(widget.user, "Hi 👋", Type.text);
                     },
-                    child: Text(
+                    child: const Text(
                       "Do you wanna say 'Hi 👋'",
                       style: TextStyle(fontSize: 18),
                     ),

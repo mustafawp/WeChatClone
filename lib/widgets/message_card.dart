@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -5,13 +7,15 @@ import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:wechat/api/apis.dart';
 import 'package:wechat/helper/date_util.dart';
+import 'package:wechat/helper/dialogs.dart';
 import 'package:wechat/main.dart';
 import 'package:wechat/models/message.dart';
 
 class MessageCard extends StatefulWidget {
-  const MessageCard({super.key, required this.message});
+  const MessageCard({super.key, required this.message, required this.state});
 
   final Message message;
+  final bool state;
 
   @override
   State<MessageCard> createState() => _MessageCardState();
@@ -30,7 +34,9 @@ class _MessageCardState extends State<MessageCard> {
   }
 
   Widget _blueMessage() {
-    if (widget.message.read.isEmpty) {
+    if (widget.message.read.isEmpty &&
+        ModalRoute.of(context)?.isCurrent == true &&
+        widget.state) {
       APIs.updateMessageReadStatus(widget.message);
     }
 
@@ -38,37 +44,51 @@ class _MessageCardState extends State<MessageCard> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Flexible(
-          child: Container(
-            padding: EdgeInsets.all(widget.message.type == Type.image
-                ? mq.width * .03
-                : mq.width * .04),
-            margin: EdgeInsets.symmetric(
-                horizontal: mq.width * .04, vertical: mq.height * .01),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 221, 245, 255),
-              border: Border.all(color: Colors.lightBlue),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-                bottomRight: Radius.circular(30),
-              ),
-            ),
-            child: widget.message.type == Type.text
-                ? Text(
-                    widget.message.msg,
-                    style: const TextStyle(fontSize: 15, color: Colors.black87),
-                  )
-                : ClipRRect(
-                    borderRadius:
-                        BorderRadius.all(Radius.circular(mq.height * .03)),
-                    child: CachedNetworkImage(
-                      imageUrl: widget.message.msg,
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.image, size: 70),
-                    ),
+          child: Stack(
+            children: [
+              Container(
+                padding: EdgeInsets.all(widget.message.type == Type.image
+                    ? mq.width * .03
+                    : mq.width * .04),
+                margin: EdgeInsets.symmetric(
+                    horizontal: mq.width * .04, vertical: mq.height * .01),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 221, 245, 255),
+                  border: Border.all(color: Colors.lightBlue),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
                   ),
+                ),
+                child: widget.message.type == Type.text
+                    ? Text(
+                        widget.message.msg,
+                        style: const TextStyle(
+                            fontSize: 15, color: Colors.black87),
+                      )
+                    : ClipRRect(
+                        borderRadius:
+                            BorderRadius.all(Radius.circular(mq.height * .03)),
+                        child: CachedNetworkImage(
+                          imageUrl: widget.message.msg,
+                          placeholder: (context, url) =>
+                              const CircularProgressIndicator(),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.image, size: 70),
+                        ),
+                      ),
+              ),
+              if (widget.message.edited.isNotEmpty)
+                Positioned(
+                  bottom: mq.width * .035,
+                  left: mq.width * .055,
+                  child: const Text(
+                    "edited",
+                    style: TextStyle(fontSize: 8, color: Colors.grey),
+                  ),
+                ),
+            ],
           ),
         ),
 
@@ -126,37 +146,51 @@ class _MessageCardState extends State<MessageCard> {
 
         // message box
         Flexible(
-          child: Container(
-            padding: EdgeInsets.all(widget.message.type == Type.image
-                ? mq.width * .03
-                : mq.width * .04),
-            margin: EdgeInsets.symmetric(
-                horizontal: mq.width * .04, vertical: mq.height * .01),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 218, 255, 176),
-              border: Border.all(color: Colors.lightGreen),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-                bottomLeft: Radius.circular(30),
-              ),
-            ),
-            child: widget.message.type == Type.text
-                ? Text(
-                    widget.message.msg,
-                    style: const TextStyle(fontSize: 15, color: Colors.black87),
-                  )
-                : ClipRRect(
-                    borderRadius:
-                        BorderRadius.all(Radius.circular(mq.height * .03)),
-                    child: CachedNetworkImage(
-                      imageUrl: widget.message.msg,
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(strokeWidth: 2),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.image, size: 70),
-                    ),
+          child: Stack(
+            children: [
+              Container(
+                padding: EdgeInsets.all(widget.message.type == Type.image
+                    ? mq.width * .03
+                    : mq.width * .04),
+                margin: EdgeInsets.symmetric(
+                    horizontal: mq.width * .04, vertical: mq.height * .01),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 218, 255, 176),
+                  border: Border.all(color: Colors.lightGreen),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                    bottomLeft: Radius.circular(30),
                   ),
+                ),
+                child: widget.message.type == Type.text
+                    ? Text(
+                        widget.message.msg,
+                        style: const TextStyle(
+                            fontSize: 15, color: Colors.black87),
+                      )
+                    : ClipRRect(
+                        borderRadius:
+                            BorderRadius.all(Radius.circular(mq.height * .03)),
+                        child: CachedNetworkImage(
+                          imageUrl: widget.message.msg,
+                          placeholder: (context, url) =>
+                              const CircularProgressIndicator(strokeWidth: 2),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.image, size: 70),
+                        ),
+                      ),
+              ),
+              if (widget.message.edited.isNotEmpty)
+                Positioned(
+                  bottom: mq.width * .035,
+                  right: mq.width * .055,
+                  child: const Text(
+                    "edited",
+                    style: TextStyle(fontSize: 8, color: Colors.grey),
+                  ),
+                ),
+            ],
           ),
         ),
       ],
@@ -206,14 +240,12 @@ class _MessageCardState extends State<MessageCard> {
                       color: Colors.blue,
                       size: 20,
                     ),
-                    "Save Image", () {
+                    "Save Image", () async {
                   Navigator.pop(context);
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return QualityDialog(context, widget.message.msg);
-                    },
-                  );
+                  Dialogs.showProgressbar(context);
+                  await _saveImage(widget.message.msg, 100);
+                  Navigator.pop(context);
+                  Dialogs.showSnackBar(context, "Picture is saved!");
                 }),
 
               // Divider
@@ -231,8 +263,10 @@ class _MessageCardState extends State<MessageCard> {
                       color: Colors.blue,
                       size: 20,
                     ),
-                    "Edit Message",
-                    () {}),
+                    "Edit Message", () {
+                  Navigator.pop(context);
+                  _showMessageUpdateDialog();
+                }),
 
               if (isMe)
                 // Delete option
@@ -275,83 +309,99 @@ class _MessageCardState extends State<MessageCard> {
                   ),
                   "Seen At: ${widget.message.read == "" ? "Not seen yet" : DateUtil.getMessageTime(context: context, time: widget.message.read)}",
                   () {}),
+
+              if (widget.message.edited.isNotEmpty)
+                // edited time
+                _OptionItem(
+                    const Icon(
+                      Icons.update,
+                      color: Colors.blue,
+                      size: 20,
+                    ),
+                    "Edited At: ${DateUtil.getMessageTime(context: context, time: widget.message.edited)}",
+                    () {}),
             ],
           );
         });
   }
 
-  Future<bool> _saveImage(String url, int Quality) async {
+  Future<bool> _saveImage(String url, int quality) async {
     try {
       var response = await Dio()
           .get(url, options: Options(responseType: ResponseType.bytes));
       await ImageGallerySaver.saveImage(Uint8List.fromList(response.data),
-          quality: Quality, name: "WeChatImage");
+          quality: quality, name: "WeChatImage");
       return true;
     } catch (e) {
       return false;
     }
   }
 
-  String selectedQuality = '';
+  void _showMessageUpdateDialog() {
+    String updatedMsg = widget.message.msg;
 
-  Widget QualityDialog(BuildContext context, String url) {
-    return AlertDialog(
-      title: Text(
-        'Kalite Seçin.',
-        style: TextStyle(color: Colors.black),
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          RadioListTile(
-            title: Text('Orta Kalite'),
-            value: 'Orta Kalite',
-            groupValue: selectedQuality,
-            onChanged: (value) {
-              _saveImage(url, 50);
-            },
-          ),
-          RadioListTile(
-            title: Text('Yüksek Kalite'),
-            value: 'Yüksek Kalite',
-            groupValue: selectedQuality,
-            onChanged: (value) {
-              _saveImage(url, 75);
-            },
-          ),
-          RadioListTile(
-            title: Text('En Yüksek Kalite'),
-            value: 'En Yüksek Kalite',
-            groupValue: selectedQuality,
-            onChanged: (value) {
-              _saveImage(url, 100);
-            },
-          ),
-        ],
-      ),
-      actions: [
-        Container(
-          width:
-              double.infinity, // Bu satır butonun genişliğini tam ekran yapar
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              'Download',
-              style: TextStyle(color: Colors.white),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color.fromARGB(255, 180, 230, 255),
-            ),
-          ),
-        ),
-      ],
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-    );
+    showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              contentPadding:
+                  const EdgeInsets.only(left: 24, right: 24, top: 15),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: const Row(
+                children: [
+                  Text("Update Message"),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Icon(
+                    Icons.message,
+                    color: Colors.blue,
+                    size: 28,
+                  ),
+                ],
+              ),
+              content: TextFormField(
+                initialValue: updatedMsg,
+                minLines: 1,
+                maxLines: 4,
+                onChanged: (value) => updatedMsg = value,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+              ),
+              actions: [
+                // cancel button
+                MaterialButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+
+                // update button
+                MaterialButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    await APIs.updateMessage(widget.message, updatedMsg);
+                  },
+                  child: const Text(
+                    "Update",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+              ],
+            ));
   }
 }
 

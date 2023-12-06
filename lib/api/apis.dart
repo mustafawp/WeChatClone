@@ -77,7 +77,7 @@ class APIs {
         await getFirebaseMessagingToken();
 
         //for setting user status to active
-        APIs.updateActiveStatus(true);
+        APIs.updateActiveStatus(true, false);
         print('My Data: ${user.data()}');
       } else {
         await createUser().then((value) => getSelfInfo());
@@ -153,12 +153,14 @@ class APIs {
     final time = DateTime.now().millisecondsSinceEpoch.toString();
 
     final Message newMessage = Message(
-        msg: msg,
-        read: '',
-        told: otherUser.id,
-        type: type,
-        fromId: user.uid,
-        sent: time);
+      msg: msg,
+      read: '',
+      told: otherUser.id,
+      type: type,
+      fromId: user.uid,
+      sent: time,
+      edited: "",
+    );
 
     final ref =
         fstore.collection('chats/${getConversationID(otherUser.id)}/messages');
@@ -203,11 +205,11 @@ class APIs {
         .snapshots();
   }
 
-  static Future<void> updateActiveStatus(bool isOnline) async {
+  static Future<void> updateActiveStatus(bool isOnline, bool state) async {
     fstore.collection('users').doc(user.uid).update({
       "isOnline": isOnline,
       "lastActive": DateTime.now().millisecondsSinceEpoch.toString(),
-      "pushToken": me.pushToken,
+      "pushToken": state ? "" : me.pushToken,
     });
   }
 
@@ -219,5 +221,16 @@ class APIs {
     if (message.type == Type.image) {
       await storage.refFromURL(message.msg).delete();
     }
+  }
+
+  static Future<void> updateMessage(Message message, String newMessage) async {
+    await fstore
+        .collection('chats/${getConversationID(message.told)}/messages')
+        .doc(message.sent)
+        .update({
+      'msg': newMessage,
+      'read': "",
+      'edited': DateTime.now().millisecondsSinceEpoch.toString(),
+    });
   }
 }
