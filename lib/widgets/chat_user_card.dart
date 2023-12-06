@@ -105,7 +105,7 @@ class _ChatUserCardState extends State<ChatUserCard> {
                                   SizedBox(
                                     width: 2,
                                   ),
-                                  Text("Photo"),
+                                  Text("Fotoğraf"),
                                 ],
                               )
                             : Text(
@@ -132,7 +132,7 @@ class _ChatUserCardState extends State<ChatUserCard> {
                                   const SizedBox(
                                     width: 2,
                                   ),
-                                  const Text("Photo"),
+                                  const Text("Fotoğraf"),
                                 ],
                               )
                             : Row(

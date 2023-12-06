@@ -68,7 +68,8 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       print("\n ERROR _signInWithGoogle: $e");
       // ignore: use_build_context_synchronously
-      Dialogs.showSnackBar(context, "Something went wrong (Check Internet)");
+      Dialogs.showSnackBar(
+          context, "Bir şeyler ters gitti. İnternetini kontrol et.");
       return null;
     }
   }
@@ -81,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // app bar
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text("Welcome to We Chat"),
+          title: const Text("WeChat'e hoşgeldin!"),
         ),
         body: Stack(
           // app logo
@@ -115,11 +116,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     text: const TextSpan(
                   style: TextStyle(color: Colors.black, fontSize: 17),
                   children: [
-                    TextSpan(text: "Sign In with "),
                     TextSpan(
                       text: "Google",
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
+                    TextSpan(text: " ile giriş yap!"),
                   ],
                 )),
               ),

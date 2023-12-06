@@ -1,15 +1,13 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wechat/api/apis.dart';
 import 'package:wechat/helper/dialogs.dart';
 import 'package:wechat/main.dart';
 import 'package:wechat/models/chat_user.dart';
-import 'package:wechat/screens/auth/login_screen.dart';
+import 'package:wechat/screens/splash_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final ChatUser user;
@@ -40,26 +38,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: FloatingActionButton.extended(
               backgroundColor: Colors.red,
               onPressed: () async {
-                Dialogs.showProgressbar(context); // yükleme ekranı
+                Navigator.pop(context);
 
-                await APIs.updateActiveStatus(
-                    false, true); // kullanıcı çevrimdışı
-
-                //sign out from app
-                await APIs.auth.signOut().then((value) async {
-                  // firebase auth dan çıkış yapıldı.
-                  await GoogleSignIn().signOut().then((value) {
-                    // google dan çıkış yapıldı
-                    APIs.auth = FirebaseAuth.instance; // auth artık bş
-                    Navigator.pop(context); // yükleme ekranı kapatıldı
-                    Navigator.pop(context); // profil kapatıldı
-                    Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (_) => const LoginScreen()));
-                  });
-                });
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const SplashScreen(
+                              step: 'step2',
+                            )));
               },
               icon: const Icon(Icons.logout),
-              label: const Text("Logout"),
+              label: const Text("Çıkış Yap"),
             ),
           ),
 
@@ -142,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onSaved: (newValue) => APIs.me.name = newValue ?? "",
                       validator: (val) => val != null && val.isNotEmpty
                           ? null
-                          : "Required Field",
+                          : "Lütfen boş yer bırakmayın.",
                       decoration: InputDecoration(
                           prefixIcon: const Icon(
                             Icons.person,
@@ -150,8 +139,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          hintText: "eg. mustafawiped",
-                          label: const Text("Name")),
+                          hintText: "örn. mustafawiped",
+                          label: const Text("Takma Ad")),
                     ),
 
                     // dikey boşluk
@@ -163,7 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onSaved: (newValue) => APIs.me.about = newValue ?? "",
                       validator: (val) => val != null && val.isNotEmpty
                           ? null
-                          : "Required Field",
+                          : "Lütfen boş yer bırakmayın.",
                       decoration: InputDecoration(
                           prefixIcon: const Icon(
                             Icons.info_outline,
@@ -171,8 +160,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          hintText: "eg. Hello! I'm using We Chat!",
-                          label: const Text("About")),
+                          hintText: "örn. Selam! Ben WeChat kullanıyorum!",
+                          label: const Text("Hakkında")),
                     ),
 
                     // dikey boşluk
@@ -190,7 +179,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             APIs.updateUserInfo().then((value) {
                               Navigator.pop(context);
                               Dialogs.showSnackBar(
-                                  context, "Profile Updated Successfully!");
+                                  context, "Profilin başarıyla güncellendi!");
                             });
                           }
                         },
@@ -199,7 +188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           size: 30,
                         ),
                         label: const Text(
-                          "Update",
+                          "Güncelle",
                           style: TextStyle(fontSize: 18),
                         ))
                   ],
@@ -225,7 +214,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               // header
               const Text(
-                "Pick Profile Picture",
+                "Fotoğrafı nereden almamızı istersin?",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
               ),

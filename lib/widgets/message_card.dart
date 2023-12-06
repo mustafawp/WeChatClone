@@ -84,7 +84,7 @@ class _MessageCardState extends State<MessageCard> {
                   bottom: mq.width * .035,
                   left: mq.width * .055,
                   child: const Text(
-                    "edited",
+                    "düzenlendi",
                     style: TextStyle(fontSize: 8, color: Colors.grey),
                   ),
                 ),
@@ -186,7 +186,7 @@ class _MessageCardState extends State<MessageCard> {
                   bottom: mq.width * .035,
                   right: mq.width * .055,
                   child: const Text(
-                    "edited",
+                    "düzenlendi",
                     style: TextStyle(fontSize: 8, color: Colors.grey),
                   ),
                 ),
@@ -224,7 +224,7 @@ class _MessageCardState extends State<MessageCard> {
                       color: Colors.blue,
                       size: 20,
                     ),
-                    "Copy Text", () async {
+                    "Metni Kopyala", () async {
                   await Clipboard.setData(
                           ClipboardData(text: widget.message.msg))
                       .then((value) {
@@ -240,12 +240,12 @@ class _MessageCardState extends State<MessageCard> {
                       color: Colors.blue,
                       size: 20,
                     ),
-                    "Save Image", () async {
+                    "Resmi Kaydet", () async {
                   Navigator.pop(context);
                   Dialogs.showProgressbar(context);
                   await _saveImage(widget.message.msg, 100);
                   Navigator.pop(context);
-                  Dialogs.showSnackBar(context, "Picture is saved!");
+                  Dialogs.showSnackBar(context, "Resim kaydedildi!!");
                 }),
 
               // Divider
@@ -263,7 +263,7 @@ class _MessageCardState extends State<MessageCard> {
                       color: Colors.blue,
                       size: 20,
                     ),
-                    "Edit Message", () {
+                    "Mesajı düzenle", () {
                   Navigator.pop(context);
                   _showMessageUpdateDialog();
                 }),
@@ -276,7 +276,7 @@ class _MessageCardState extends State<MessageCard> {
                       color: Colors.red,
                       size: 20,
                     ),
-                    "Delete Message", () async {
+                    "Mesajı sil", () async {
                   await APIs.deleteMessage(widget.message);
 
                   Navigator.pop(context);
@@ -297,7 +297,7 @@ class _MessageCardState extends State<MessageCard> {
                     color: Colors.blue,
                     size: 20,
                   ),
-                  "Sent At: ${DateUtil.getMessageTime(context: context, time: widget.message.sent)}",
+                  "Teslim Edildi: ${DateUtil.getMessageTime(context: context, time: widget.message.sent)}",
                   () {}),
 
               // read time
@@ -307,7 +307,7 @@ class _MessageCardState extends State<MessageCard> {
                     color: Colors.green,
                     size: 20,
                   ),
-                  "Seen At: ${widget.message.read == "" ? "Not seen yet" : DateUtil.getMessageTime(context: context, time: widget.message.read)}",
+                  "Görüldü: ${widget.message.read == "" ? "Not seen yet" : DateUtil.getMessageTime(context: context, time: widget.message.read)}",
                   () {}),
 
               if (widget.message.edited.isNotEmpty)
@@ -318,7 +318,7 @@ class _MessageCardState extends State<MessageCard> {
                       color: Colors.blue,
                       size: 20,
                     ),
-                    "Edited At: ${DateUtil.getMessageTime(context: context, time: widget.message.edited)}",
+                    "Düzenlendi: ${DateUtil.getMessageTime(context: context, time: widget.message.edited)}",
                     () {}),
             ],
           );
@@ -349,7 +349,7 @@ class _MessageCardState extends State<MessageCard> {
                   borderRadius: BorderRadius.circular(20)),
               title: const Row(
                 children: [
-                  Text("Update Message"),
+                  Text("Mesajı Güncelle"),
                   SizedBox(
                     width: 5,
                   ),
@@ -378,7 +378,7 @@ class _MessageCardState extends State<MessageCard> {
                     Navigator.pop(context);
                   },
                   child: const Text(
-                    "Cancel",
+                    "İptal",
                     style: TextStyle(
                       color: Colors.blue,
                       fontSize: 16,
@@ -393,7 +393,7 @@ class _MessageCardState extends State<MessageCard> {
                     await APIs.updateMessage(widget.message, updatedMsg);
                   },
                   child: const Text(
-                    "Update",
+                    "Düzenle",
                     style: TextStyle(
                       color: Colors.blue,
                       fontSize: 16,

@@ -46,7 +46,7 @@ class DateUtil {
     final int i = int.tryParse(lastActive) ?? -1;
 
     //if time is not available then return below statement
-    if (i == -1) return 'Last seen not available';
+    if (i == -1) return 'Son görülme kullanılamaz.';
 
     DateTime time = DateTime.fromMillisecondsSinceEpoch(i);
     DateTime now = DateTime.now();
@@ -55,46 +55,46 @@ class DateUtil {
     if (time.day == now.day &&
         time.month == now.month &&
         time.year == time.year) {
-      return 'Last seen today at $formattedTime';
+      return 'Son görülme bugün $formattedTime';
     }
 
     if ((now.difference(time).inHours / 24).round() == 1) {
-      return 'Last seen yesterday at $formattedTime';
+      return 'Son görülme dün $formattedTime';
     }
 
     String month = _getMonth(time);
 
-    return 'Last seen on ${time.day} $month on $formattedTime';
+    return 'Son giriş ${time.day} $month saat $formattedTime';
   }
 
   static String _getMonth(DateTime date) {
     switch (date.month) {
       case 1:
-        return "Jan";
+        return "Oca";
       case 2:
-        return "Feb";
+        return "Şub";
       case 3:
         return "Mar";
       case 4:
-        return "Apr";
+        return "Nis";
       case 5:
         return "May";
       case 6:
-        return "Jun";
+        return "Haz";
       case 7:
-        return "Jul";
+        return "Tem";
       case 8:
-        return "Aug";
+        return "Ağu";
       case 9:
-        return "Sept";
+        return "Eyl";
       case 10:
-        return "Oct";
+        return "Eki";
       case 11:
-        return "Nov";
+        return "Kas";
       case 12:
-        return "Dec";
+        return "Ara";
       default:
-        return "Invalid";
+        return "N/A";
     }
   }
 }

@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wechat/api/apis.dart';
+import 'package:wechat/helper/dialogs.dart';
 import 'package:wechat/main.dart';
 import 'package:wechat/models/chat_user.dart';
 import 'package:wechat/screens/profile_screen.dart';
@@ -63,12 +66,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (_isSearching) _isSearching = !_isSearching;
                   });
                 },
-                child: Icon(CupertinoIcons.home)),
+                child: const Icon(CupertinoIcons.home)),
             title: _isSearching
                 ? TextField(
                     decoration: const InputDecoration(
                         border: InputBorder.none,
-                        hintText: "Search by name or mail.."),
+                        hintText: "Sohbetlerde ara..."),
                     autofocus: true,
                     style: const TextStyle(fontSize: 17, letterSpacing: 0.5),
                     controller: _searchController,
@@ -92,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                     },
                   )
-                : const Text("We Chat"),
+                : const Text("WeChat"),
             actions: [
               // search user button
               if (_searchController.text.isNotEmpty || !_isSearching)
@@ -127,52 +130,159 @@ class _HomeScreenState extends State<HomeScreen> {
           floatingActionButton: Padding(
             padding: const EdgeInsets.only(bottom: 10.0),
             child: FloatingActionButton(
-              onPressed: () async {},
+              onPressed: () async {
+                _showAddUserPage();
+              },
               child: const Icon(Icons.add_comment_rounded),
             ),
           ),
-
           body: StreamBuilder(
-            stream: APIs.getAllUsers(),
+            stream: APIs.getMyUsersID(),
+
+            //get id of only known users
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
+                //if data is loading
                 case ConnectionState.waiting:
                 case ConnectionState.none:
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
 
+                //if some or all data is loaded then show it
                 case ConnectionState.active:
                 case ConnectionState.done:
-              }
+                  return StreamBuilder(
+                    stream: APIs.getAllUsers(
+                        snapshot.data?.docs.map((e) => e.id).toList() ?? []),
 
-              if (snapshot.hasData) {
-                final data = snapshot.data?.docs;
-                list = data!.map((e) => ChatUser.fromMap(e.data())).toList();
-              }
+                    //get only those user, who's ids are provided
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState) {
+                        //if data is loading
+                        case ConnectionState.waiting:
+                        case ConnectionState.none:
+                          return const Center(
+                              child: CircularProgressIndicator());
 
-              if (list.isNotEmpty) {
-                return ListView.builder(
-                  itemCount: _isSearching ? _searchList.length : list.length,
-                  padding: EdgeInsets.only(top: mq.height * .01),
-                  physics: const BouncingScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return ChatUserCard(
-                        user: _isSearching ? _searchList[index] : list[index]);
-                  },
-                );
-              } else {
-                return const Center(
-                  child: Text(
-                    "No Connections Found!",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                );
+                        //if some or all data is loaded then show it
+                        case ConnectionState.active:
+                        case ConnectionState.done:
+                          final data = snapshot.data?.docs;
+                          list = data
+                                  ?.map((e) => ChatUser.fromMap(e.data()))
+                                  .toList() ??
+                              [];
+
+                          if (list.isNotEmpty) {
+                            return ListView.builder(
+                                itemCount: _isSearching
+                                    ? _searchList.length
+                                    : list.length,
+                                padding: EdgeInsets.only(top: mq.height * .01),
+                                physics: const BouncingScrollPhysics(),
+                                itemBuilder: (context, index) {
+                                  return ChatUserCard(
+                                      user: _isSearching
+                                          ? _searchList[index]
+                                          : list[index]);
+                                });
+                          } else {
+                            return const Center(
+                              child: Text('Burada hiçkimse yok :/',
+                                  style: TextStyle(fontSize: 20)),
+                            );
+                          }
+                      }
+                    },
+                  );
               }
             },
           ),
         ),
       ),
     );
+  }
+
+  void _showAddUserPage() {
+    String email = "";
+
+    showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              contentPadding:
+                  const EdgeInsets.only(left: 24, right: 24, top: 15),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: const Row(
+                children: [
+                  Text("Kullanıcı Ekle"),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Icon(
+                    Icons.person_add,
+                    color: Colors.blue,
+                    size: 28,
+                  ),
+                ],
+              ),
+              content: TextFormField(
+                initialValue: "",
+                minLines: 1,
+                maxLength: 40,
+                keyboardType: TextInputType.emailAddress,
+                onChanged: (value) => email = value,
+                decoration: InputDecoration(
+                  hintText: "Eposta adresi..",
+                  prefixIcon: const Icon(
+                    Icons.email,
+                    color: Colors.blue,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+              ),
+              actions: [
+                // cancel button
+                MaterialButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text(
+                    "Vazgeç",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+
+                // update button
+                MaterialButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    if (email.isNotEmpty) {
+                      Dialogs.showProgressbar(context);
+                      bool state = await APIs.addChatUser(email);
+                      Navigator.pop(context);
+                      if (!state) {
+                        Dialogs.showSnackBar(
+                            context, "Böyle bir kullanıcı bulunamadı!");
+                      }
+                    } else {
+                      Dialogs.showSnackBar(
+                          context, "Lütfen eposta adresi girin.");
+                    }
+                  },
+                  child: const Text(
+                    "Ekle",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+              ],
+            ));
   }
 }

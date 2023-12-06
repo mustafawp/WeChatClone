@@ -188,7 +188,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   Text(
                     list.isNotEmpty
                         ? list[0].isOnline
-                            ? "Online"
+                            ? "Çevrimiçi"
                             : DateUtil.getLastActiveTime(
                                 context: context,
                                 lastActive: list[0].lastActive)
@@ -243,7 +243,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     keyboardType: TextInputType.multiline,
                     textCapitalization: TextCapitalization.sentences,
                     decoration: const InputDecoration(
-                      hintText: "Type Something..",
+                      hintText: "Mesaj..",
                       hintStyle: TextStyle(color: Colors.blueAccent),
                       border: InputBorder.none,
                     ),
@@ -265,7 +265,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     onPressed: () async {
                       if (_isUpLoading) {
                         Dialogs.showSnackBar(
-                            context, "uploading another photo at the moment.");
+                            context, "Şuanda zaten bir fotoğraf yüklüyorsun.");
                         return;
                       }
                       final picker = ImagePicker();
@@ -293,7 +293,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     onPressed: () async {
                       if (_isUpLoading) {
                         Dialogs.showSnackBar(
-                            context, "uploading another photo at the moment.");
+                            context, "Şuan zaten bir fotoğraf yüklüyorsun.");
                         return;
                       }
                       final picker = ImagePicker();
@@ -384,7 +384,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       APIs.sendMessage(widget.user, "Hi 👋", Type.text);
                     },
                     child: const Text(
-                      "Do you wanna say 'Hi 👋'",
+                      '"Merhaba 👋" demek ister misin?',
                       style: TextStyle(fontSize: 18),
                     ),
                   ),

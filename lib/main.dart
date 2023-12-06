@@ -63,9 +63,11 @@ class MyApp extends StatelessWidget {
         backgroundColor: Colors.white,
       )),
       routes: {
-        '/home': (context) => HomeScreen(),
+        '/home': (context) => const HomeScreen(),
       },
-      home: const SplashScreen(),
+      home: const SplashScreen(
+        step: 'step1',
+      ),
       //home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }

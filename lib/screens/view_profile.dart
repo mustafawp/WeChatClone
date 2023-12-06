@@ -28,7 +28,7 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                "Joined On ",
+                "Katılım Tarihi: ",
                 style: TextStyle(
                     color: Colors.black87,
                     fontWeight: FontWeight.w500,
@@ -85,20 +85,20 @@ class _ViewProfileScreenState extends State<ViewProfileScreen> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        "About",
+                      const Text(
+                        "Hakkında",
                         style: TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.w500,
                           fontSize: 19,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                           height:
                               8), // İsteğe bağlı: Biraz boşluk ekleyebilirsiniz.
                       Text(
                         widget.user.about,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.black54,
                           fontSize: 16,
                         ),

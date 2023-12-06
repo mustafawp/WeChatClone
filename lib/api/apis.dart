@@ -69,6 +69,33 @@ class APIs {
     return (await fstore.collection("users").doc(user.uid).get()).exists;
   }
 
+  // for adding an chat user for our conversation
+  static Future<bool> addChatUser(String email) async {
+    final data =
+        await fstore.collection('users').where('email', isEqualTo: email).get();
+
+    print('data: ${data.docs}');
+
+    if (data.docs.isNotEmpty && data.docs.first.id != user.uid) {
+      //user exists
+
+      print('user exists: ${data.docs.first.data()}');
+
+      await fstore
+          .collection('users')
+          .doc(user.uid)
+          .collection('my_users')
+          .doc(data.docs.first.id)
+          .set({});
+
+      return true;
+    } else {
+      //user doesn't exists
+
+      return false;
+    }
+  }
+
   // for getting current user info
   static Future<void> getSelfInfo() async {
     await fstore.collection('users').doc(user.uid).get().then((user) async {
@@ -103,10 +130,20 @@ class APIs {
   }
 
   // tüm kullanıcıları çek
-  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers() {
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getMyUsersID() {
     return fstore
         .collection('users')
-        .where("id", isNotEqualTo: user.uid)
+        .doc(user.uid)
+        .collection("my_users")
+        .snapshots();
+  }
+
+  // tüm kullanıcıları çek
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers(
+      List<String> userIds) {
+    return fstore
+        .collection('users')
+        .where('id', whereIn: userIds.isEmpty ? [''] : userIds)
         .snapshots();
   }
 
